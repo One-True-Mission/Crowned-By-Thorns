@@ -1,95 +1,194 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=EB+Garamond:wght@400;600;700&display=swap');
+
 /* ---------- styles.css ---------- */
-/* Theme tokens */
-:root{
-  --bg-brightness: 0.85;                 /* 0.50–1.15 via slider */
-  --tint: rgba(255,255,255,.86);         /* card background */
+:root {
+  --bg-brightness: 0.85;
+  --tint: rgba(255,255,255,.86);
   --tint-weak: rgba(255,255,255,.65);
   --ink: #2b2118;
   --muted: #6b5550;
-
-  --head: #7e4c2a;                       /* header color everywhere */
+  --head: #7e4c2a;
   --brand: #a86b3d;
 
   --card: color-mix(in oklab, var(--tint) 90%, white 10%);
-  --panel: #ffe7b3;                      /* soft yellow inner panel */
-  --btn: #eed3b1;                        /* warm button background */
+  --panel: #ffe7b3;
+
+  --btn: #eed3b1;         /* page button bg */
   --btn-ghost: #f7efe4;
   --btn-ink: #3b2a23;
 
+  --menu-btn: #fff4dd;           /* menu button bg */
+  --menu-btn-border: #e3c67a;    /* darker gold border */
+
+  --parch2: #ffefb8;      /* shop btn bg */
   --shadow: 0 16px 40px rgba(0,0,0,.20);
   --radius: 16px;
   --maxw: 900px;
+
+  /* Menu palette (90% opaque warm yellow) */
+  --menu-bg: rgba(255, 231, 186, 0.9);
+  --menu-card: #fff1cc;
+  --menu-card-hover: #ffe6a8;
+  --menu-ink: #2b2118;
+  --menu-border: #c79a39;
+  --menu-border-hover: #b57f25;
+  --menu-shadow: 0 12px 30px rgba(0,0,0,.12);
 }
 
-/* Fixed background (always centered) */
-.bg{
-  position: fixed; inset: 0;
-  background: url('../assets/bg.jpg') center / cover no-repeat fixed;
-  filter: brightness(var(--bg-brightness));
+/* ---------- Background ---------- */
+.bg {
+  position: fixed;
+  inset: 0;
   z-index: -2;
+  overflow: hidden;
 }
-/* faint overlay for readability */
-.shade{
+.bg-img {
+  position: fixed;
+  inset: 0;
+  width: 100vw; height: 100vh;
+  object-fit: cover; object-position: center;
+  filter: brightness(var(--bg-brightness));
+  transform: translateZ(0);
+}
+.shade {
   position: fixed; inset: 0;
   background: radial-gradient(ellipse at center, rgba(255,255,255,.22), rgba(255,255,255,.10) 60%);
   z-index: -1;
 }
 
-/* Topbar */
-.topbar{
+/* ---------- Topbar ---------- */
+.topbar {
   position: sticky; top: 0; z-index: 10;
   display: flex; align-items: center; gap: 14px;
   padding: 14px 16px;
   background: color-mix(in oklab, var(--tint) 80%, transparent);
-  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   border-bottom: 1px solid rgba(0,0,0,.05);
 }
-.brand{
+.brand {
   margin: 0;
+  font-family: "Cinzel", serif;
+  font-weight: 700;
+  letter-spacing: .01em;
   font-size: clamp(22px, 4vw, 32px);
-  line-height: 1.1;
-  letter-spacing: .02em;
   color: var(--brand);
   text-shadow: 0 1px 0 rgba(255,255,255,.8);
 }
-.hamburger{
-  font-size: 22px; background: transparent; border: 0; padding: 6px 10px; border-radius: 8px;
-  color: var(--head);
+.hamburger {
+  font-size: 22px; background: transparent; border: 0;
+  padding: 6px 10px; border-radius: 8px; color: var(--head);
 }
-.hamburger:focus{ outline: 2px solid var(--head); outline-offset: 2px; }
+.hamburger:focus { outline: 2px solid var(--head); outline-offset: 2px; }
 
-/* Off-canvas menu */
-.sidemenu{
+/* ---------- Side Menu (Drawer) ---------- */
+/* Warm yellow, ~10% transparent; consistent Safari + Chrome */
+.sidemenu {
   position: fixed; inset: 0 0 0 auto;
   width: min(420px, 86vw);
-  background: var(--tint);
+  /* Use a single solid color with alpha for browser consistency */
+  background: var(--menu-bg);
   translate: 100% 0;
   transition: translate .25s ease;
   box-shadow: -8px 0 30px rgba(0,0,0,.2);
   z-index: 20;
+  border-left: 1px solid rgba(0,0,0,0.05);
+  overflow: hidden;
+
+  /* Ensure no weird blending/filters interfere */
+  opacity: 1;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  mix-blend-mode: normal;
+  isolation: isolate;
 }
-.sidemenu.open{ translate: 0 0; }
-.menu-inner{ height: 100%; display: grid; grid-template-rows: auto 1fr auto; gap: 16px; padding: 18px; }
-.sidemenu .close{ justify-self: end; border: 0; background: transparent; font-size: 28px; color: var(--head); }
-.sidemenu .btn.shop{ background: #c2462d; color: #fff; }
-.sidemenu .links{ display: grid; gap: 10px; }
-.sidemenu .link{ padding: 10px 12px; border-radius: 10px; background: #f2e7d4; color: var(--ink); text-decoration: none; }
-.settings{ border-top: 1px solid rgba(0,0,0,.06); padding-top: 12px; }
-.settings label{ display:block; font-weight:600; margin-bottom: 6px; color: var(--head); }
+/* Open state */
+.sidemenu.open { translate: 0 0; }
+
+/* REMOVE the watermark/cross overlay entirely (was causing Safari issues) */
+.sidemenu::before,
+.sidemenu::after {
+  content: none !important;
+  background: none !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+}
+
+/* Menu inner container */
+.menu-inner{
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 20px;
+  box-sizing: border-box; max-width: 100%;
+  min-height: 100vh;
+  position: relative; z-index: 1;
+}
+
+/* ---------- Menu Buttons ---------- */
+.menu-btn{
+  display: block; width: 100%;
+  padding: 14px 18px; margin: 8px 0;
+  border-radius: var(--radius);
+  text-align: center;
+  font-family: "Cinzel", serif;  /* biblical feel */
+  font-weight: 600;              /* consistent weight */
+  letter-spacing: .01em;
+  background: var(--menu-btn);
+  color: var(--ink);
+  text-decoration: none;
+  border: 2px solid var(--menu-btn-border); /* darker gold border */
+  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+  transition: background .25s ease, transform .2s ease, border-color .25s ease, box-shadow .12s ease;
+  box-sizing: border-box;
+}
+.menu-btn:hover { background: #fffdf3; transform: translateY(-1px); }
+
+/* Shop button — distinct but harmonious */
+.menu-btn-shop{
+  background: var(--parch2);
+  border-color: #d8b760;       /* slightly richer gold */
+  font-weight: 700;
+}
+
+/* Placeholder (not clickable but same visual weight) */
+.menu-btn.placeholder{
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* Single divider between shop and the cluster below */
+.menu-divider{
+  border: none; border-top: 1px solid rgba(0,0,0,.15);
+  margin: 10px 0;
+}
+
+/* Settings at bottom */
+.settings{
+  margin-top: auto;
+  border-top: 1px solid rgba(0,0,0,.10);
+  padding-top: 12px;
+  background: transparent;
+}
+.settings label{
+  display:block; font-weight:700; margin-bottom:6px; color: var(--head);
+  font-family: "Cinzel", serif;
+}
 .settings input[type="range"]{ width: 100%; }
+
+/* Backdrop (controlled by app.js) */
 .backdrop{ position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 15; }
 
-/* Layout */
+/* ---------- Page Layout ---------- */
 .wrap{ width: min(var(--maxw), 92vw); margin-inline: auto; padding: 22px 0 80px; }
-/* spacer to show the cross first */
 .hero-gap{ height: 34vh; }
 @media (min-width: 720px){ .hero-gap{ height: 38vh; } }
 
+/* ---------- Search ---------- */
 .search{ display: grid; grid-template-columns: 1fr auto; gap: 10px; margin: 10px 0 18px; }
 .search input{
   padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,.08);
   background: var(--tint); color: var(--ink);
 }
+
+/* ---------- Cards ---------- */
 .card{
   background: var(--card);
   color: var(--ink);
@@ -98,15 +197,15 @@
   padding: clamp(14px, 2.4vw, 22px);
   margin: 14px 0;
 }
-/* Headers: same style/color across all cards */
 .card h2, .card h3, .ref{
   margin: 0 0 8px;
   font-size: clamp(18px, 3.3vw, 24px);
   color: var(--head);
   font-weight: 700;
+  font-family: "Cinzel", serif;
 }
 
-/* Yellow inner panel just for the verse text */
+/* Inner verse panel */
 .panel{
   background: var(--panel);
   border: 1px solid rgba(0,0,0,.04);
@@ -114,34 +213,134 @@
   padding: 14px 16px;
 }
 
-.verse{ font-size: clamp(18px, 2.8vw, 22px); line-height: 1.5; }
-.meaning{ font-size: clamp(16px, 2.6vw, 20px); line-height: 1.6; color: #2b2118; }
+.verse{
+  font-family: "EB Garamond", serif;
+  font-size: clamp(18px, 2.8vw, 22px);
+  line-height: 1.5;
+}
+.meaning{
+  font-family: "EB Garamond", serif;
+  font-size: clamp(16px, 2.6vw, 20px);
+  line-height: 1.6;
+  color: #2b2118;
+}
 
 .actions{ display:flex; gap:10px; margin-top: 10px; flex-wrap: wrap; }
 
-/* Warm button colors (no blue) */
+/* ---------- Buttons on page ---------- */
 .btn{
-  padding: 10px 14px;
-  border-radius: 12px;
+  padding: 10px 14px; border-radius: 12px;
   border: 1px solid rgba(0,0,0,.08);
-  background: var(--btn);
-  color: var(--btn-ink);
+  background: var(--btn); color: var(--btn-ink);
   cursor: pointer;
+  font-family: "EB Garamond", serif;
 }
 .btn:hover{ filter: brightness(0.98); }
 .btn:active{ filter: brightness(0.95); }
 .btn.ghost{ background: var(--btn-ghost); }
 
-/* Footer */
+/* ---------- Footer ---------- */
 .footer{
   position: sticky; bottom: 0;
   display: flex; justify-content: center; align-items: center;
-  padding: 12px 16px;
-  color: #6b5550;
-  font-size: 14px;
+  padding: 12px 16px; color: #6b5550; font-size: 14px;
   background: color-mix(in oklab, var(--tint-weak) 70%, transparent);
-  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  font-family: "EB Garamond", serif;
 }
 
-/* Accessibility focus */
+/* ---------- Focus ---------- */
 :focus-visible{ outline: 2px solid var(--head); outline-offset: 2px; }
+
+/* ---------- Side Menu (ID-specific styles for links/buttons) ---------- */
+#sidemenu{
+  background: var(--menu-bg);                 /* ensure ID also has the color */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: var(--menu-shadow);
+  color: var(--menu-ink);
+}
+
+/* Remove any lingering image/overlay on the ID too */
+#sidemenu, #sidemenu::before, #sidemenu::after,
+#sidemenu .menu-inner, #sidemenu .menu-inner::before, #sidemenu .menu-inner::after {
+  background-image: none !important;
+  content: none !important;
+}
+
+/* Menu heading inside the drawer (if used) */
+#sidemenu .menu-title,
+#sidemenu h1, #sidemenu h2, #sidemenu h3{
+  font-family: "Cinzel", Georgia, "Times New Roman", serif;
+  font-weight: 800;
+  color: var(--menu-ink);
+  -webkit-font-smoothing: auto;
+  text-rendering: optimizeLegibility;
+}
+
+/* Buttons inside the drawer (strong, outlined) */
+#sidemenu a,
+#sidemenu button,
+#sidemenu .menu-btn,
+#sidemenu .btn{
+  display: block;
+  width: 100%;
+  font-family: "Cinzel", Georgia, "Times New Roman", serif;
+  font-weight: 800;
+  font-size: clamp(18px, 2.6vw, 24px);
+  color: var(--menu-ink);
+  background: var(--menu-card);
+  border: 3px solid var(--menu-border);
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin: 18px 18px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.10);
+  -webkit-appearance: none;
+  background-clip: padding-box;
+  text-align: center;
+  text-decoration: none;
+  transition: 
+    background-color .15s ease,
+    border-color .15s ease,
+    transform .08s ease,
+    box-shadow .12s ease;
+}
+
+/* Top/first button a touch stronger */
+#sidemenu .menu-inner > a:first-of-type {
+  background: #ffe6a8;
+  border-color: #b57f25;
+  box-shadow: 0 8px 20px rgba(0,0,0,.16), inset 0 0 0 1px rgba(255,255,255,.35);
+}
+
+/* Hover / tap */
+#sidemenu a:hover, 
+#sidemenu button:hover,
+#sidemenu .menu-btn:hover,
+#sidemenu .btn:hover {
+  background: var(--menu-card-hover);
+  border-color: var(--menu-border-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.14);
+}
+#sidemenu a:active, 
+#sidemenu button:active,
+#sidemenu .menu-btn:active,
+#sidemenu .btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 18px rgba(0,0,0,.10);
+}
+
+/* Divider line inside the drawer (if you use <hr>) */
+#sidemenu hr{
+  border: 0;
+  height: 1px;
+  margin: 18px 18px 10px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,.15), transparent);
+}
+
+/* Ensure no old overlay shades appear */
+#sidemenu .shade, #sidemenu .overlay{
+  display: none !important;
+  opacity: 0 !important;
+}
